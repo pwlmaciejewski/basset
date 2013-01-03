@@ -64,7 +64,8 @@ buster.testCase 'Sniffer test case',
 			har = 
 				log:
 					pages: [
-						onLoad: 1937
+						pageTimings:
+							onLoad: 1937
 					],
 					entries: []
 			@result = Sniffer.getResultsFromHar har

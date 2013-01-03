@@ -10,9 +10,9 @@ class Sniffer
 	run: (callback = ->) ->
 		exec 'phantomjs ' + netsnifferPath + ' ' + @url, (err, stdout) =>
 			if err then callback err
-			else callback null, Sniffer.getResultsFromHar()
+			else callback null, Sniffer.getResultsFromHar(JSON.parse(stdout))
 
 Sniffer.getResultsFromHar = (har) ->
-	onLoad: har.log.pages[0].onLoad
+	onLoad: har.log.pages[0].pageTimings.onLoad
 
 module.exports = Sniffer

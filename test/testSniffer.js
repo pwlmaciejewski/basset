@@ -98,7 +98,9 @@ buster.testCase('Sniffer test case', {
         log: {
           pages: [
             {
-              onLoad: 1937
+              pageTimings: {
+                onLoad: 1937
+              }
             }
           ],
           entries: []
