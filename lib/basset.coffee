@@ -1,11 +1,13 @@
 ReporterFactory = require './reporterFactory'
 
 class Basset
-	constructor: (options) ->
+	constructor: (url = null, options = {}) ->
+		unless typeof url is 'string' then throw new Error 'URL required'
+
 		@options = @createOptions options
 		@reporter = @options.ReporterFactory.createReporter @options.reporter
 
-	createOptions: (options) ->
+	createOptions: (options = {}) ->
 		res = {}
 		for name, value of Basset.defaultOptions
 			res[name] = value

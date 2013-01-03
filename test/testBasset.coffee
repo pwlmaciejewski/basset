@@ -5,7 +5,16 @@ Reporter = require '../lib/reporter/reporter'
 
 buster.testCase 'Basset test case', 
 	setUp: ->
-		@basset = new Basset
+		@basset = new Basset 'http://example.com'
+
+	'first argument (url)':
+		'test is required': ->
+			assert.exception =>
+				new Basset()
+
+		'test is a string': ->
+			assert.exception =>
+				new Basset {}
 
 	'options':
 		'test default options': ->
@@ -15,7 +24,7 @@ buster.testCase 'Basset test case',
 			assert.equals Basset.defaultOptions.ReporterFactory, ReporterFactory
 
 		'test constructor options': ->
-			basset = new Basset
+			basset = new Basset 'http://example.com',
 				repeatNum: 3
 			assert.equals basset.options.repeatNum, 3
 
@@ -23,6 +32,5 @@ buster.testCase 'Basset test case',
 			@Factory = Object.create ReporterFactory
 			@Factory.reporters = []
 			assert.exception =>
-				basset = new Basset
+				basset = new Basset 'http://example.com',
 					ReporterFactory: @Factory
-

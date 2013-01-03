@@ -33,7 +33,9 @@
     "grunt-exec": "*",
     "grunt-coffee": "*",
     "grunt-rm": "*",
-    "grunt": "~0.3.17"
+    "grunt": "~0.3.17",
+    "sandboxed-module": "~0.1.4",
+    "sinon": "~1.5.2"
   },
   "keywords": [],
   "dependencies": {
