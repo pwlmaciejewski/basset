@@ -1,10 +1,12 @@
-var Basset, ReporterFactory, buster;
+var Basset, Reporter, ReporterFactory, buster;
 
 buster = require('buster');
 
 Basset = require('../lib/basset');
 
 ReporterFactory = require('../lib/reporterFactory');
+
+Reporter = require('../lib/reporter/reporter');
 
 buster.testCase('Basset test case', {
   setUp: function() {
@@ -13,9 +15,8 @@ buster.testCase('Basset test case', {
   'options': {
     'test default options': function() {
       assert.equals(Basset.defaultOptions.repeatNum, 1);
-      assert.equals(Basset.defaultOptions.format, 'plain');
+      assert.equals(Basset.defaultOptions.reporter, 'plain');
       assert.equals(Basset.defaultOptions.info, 'short');
-      assert.equals(Basset.defaultOptions.tmpHarDir, process.cwd());
       return assert.equals(Basset.defaultOptions.ReporterFactory, ReporterFactory);
     },
     'test constructor options': function() {
@@ -24,6 +25,17 @@ buster.testCase('Basset test case', {
         repeatNum: 3
       });
       return assert.equals(basset.options.repeatNum, 3);
+    },
+    'test invalid reporter': function() {
+      var _this = this;
+      this.Factory = Object.create(ReporterFactory);
+      this.Factory.reporters = [];
+      return assert.exception(function() {
+        var basset;
+        return basset = new Basset({
+          ReporterFactory: _this.Factory
+        });
+      });
     }
   }
 });

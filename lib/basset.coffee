@@ -3,6 +3,7 @@ ReporterFactory = require './reporterFactory'
 class Basset
 	constructor: (options) ->
 		@options = @createOptions options
+		@reporter = @options.ReporterFactory.createReporter @options.reporter
 
 	createOptions: (options) ->
 		res = {}
@@ -12,12 +13,10 @@ class Basset
 			res[name] = value
 		res
 
-
 Basset.defaultOptions =
 	repeatNum: 1
-	format: 'plain'
+	reporter: 'plain'
 	info: 'short'
-	tmpHarDir: process.cwd()
 	ReporterFactory: ReporterFactory
 
 module.exports = Basset

@@ -1,6 +1,7 @@
 buster = require 'buster'
 Basset = require '../lib/basset'
 ReporterFactory = require '../lib/reporterFactory'
+Reporter = require '../lib/reporter/reporter'
 
 buster.testCase 'Basset test case', 
 	setUp: ->
@@ -9,9 +10,8 @@ buster.testCase 'Basset test case',
 	'options':
 		'test default options': ->
 			assert.equals Basset.defaultOptions.repeatNum, 1
-			assert.equals Basset.defaultOptions.format, 'plain'
+			assert.equals Basset.defaultOptions.reporter, 'plain'
 			assert.equals Basset.defaultOptions.info, 'short'
-			assert.equals Basset.defaultOptions.tmpHarDir, process.cwd()
 			assert.equals Basset.defaultOptions.ReporterFactory, ReporterFactory
 
 		'test constructor options': ->
@@ -19,9 +19,10 @@ buster.testCase 'Basset test case',
 				repeatNum: 3
 			assert.equals basset.options.repeatNum, 3
 
-		# 'test invalid reporter': ->
-		# 	class FooReporterFactory extends ReporterFactory
-				
-				
-		# 	basset = new Basset
+		'test invalid reporter': ->
+			@Factory = Object.create ReporterFactory
+			@Factory.reporters = []
+			assert.exception =>
+				basset = new Basset
+					ReporterFactory: @Factory
 
