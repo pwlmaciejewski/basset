@@ -20,7 +20,7 @@
       "url": "https://github.com/fragphace/basset/blob/master/LICENSE-MIT"
     }
   ],
-  "bin": "bin/basset.js",
+  "bin": "node bin/basset.js",
   "main": "lib/basset",
   "engines": {
     "node": ">=0.8.0"
@@ -39,6 +39,7 @@
   },
   "keywords": [],
   "dependencies": {
-    "optimist": "~0.3.5"
+    "optimist": "~0.3.5",
+    "async": "~0.1.22"
   }
 }

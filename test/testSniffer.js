@@ -1,4 +1,4 @@
-var Sniffer, buster, execError, execSpy, execStdout, path, sandbox, sinon;
+var Result, Sniffer, buster, execError, execSpy, execStdout, path, sandbox, sinon;
 
 buster = require('buster');
 
@@ -8,6 +8,8 @@ sandbox = require('sandboxed-module');
 
 path = require('path');
 
+Result = require('../lib/result');
+
 execError = function() {
   return null;
 };
@@ -16,7 +18,7 @@ execStdout = function() {
   return '{}';
 };
 
-execSpy = sinon.spy(function(command, callback) {
+execSpy = sinon.spy(function(command, options, callback) {
   if (callback == null) {
     callback = function() {};
   }
@@ -58,12 +60,7 @@ buster.testCase('Sniffer test case', {
   },
   'run': {
     setUp: function() {
-      this.spy = sinon.spy();
-      this.getResultsFromHarSpy = sinon.spy();
-      return sinon.stub(Sniffer, 'getResultsFromHar');
-    },
-    tearDown: function() {
-      return Sniffer.getResultsFromHar.restore();
+      return this.spy = sinon.spy();
     },
     'test runs phantomjs': function() {
       var netsniffPath, phantomjsExecCommand;
@@ -83,16 +80,9 @@ buster.testCase('Sniffer test case', {
         return error;
       };
       this.sniffer.run(this.spy);
-      assert.calledWith(this.spy, error);
-      return refute.called(Sniffer.getResultsFromHar);
+      return assert.calledWith(this.spy, error);
     },
     'test result': function() {
-      this.sniffer.run();
-      return assert.called(Sniffer.getResultsFromHar);
-    }
-  },
-  'getResultsFromHar': {
-    setUp: function() {
       var har;
       har = {
         log: {
@@ -106,10 +96,12 @@ buster.testCase('Sniffer test case', {
           entries: []
         }
       };
-      return this.result = Sniffer.getResultsFromHar(har);
-    },
-    'test page load': function() {
-      return assert.equals(this.result.onLoad, 1937);
+      execStdout = function() {
+        return JSON.stringify(har);
+      };
+      this.sniffer.run(this.spy);
+      assert.calledWith(this.spy, null);
+      return assert(this.spy.getCall(0).args[1].constructor.name === 'Result');
     }
   }
 });

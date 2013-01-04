@@ -4,15 +4,7 @@ sandbox = require 'sandboxed-module'
 ReporterFactory = require '../lib/reporterFactory'
 Reporter = require '../lib/reporter/reporter'
 Sniffer = require '../lib/sniffer'
-
-class FooSniffer extends Sniffer
-	run: (callback) ->
-		setTimeout callback, 1
-
-Basset = sandbox.require '../lib/basset'
-	requires:
-		sniffer: FooSniffer
-
+Basset = require '../lib/basset'
 
 buster.testCase 'Basset test case', 
 	setUp: ->
@@ -31,49 +23,88 @@ buster.testCase 'Basset test case',
 	'options':
 		'test default options': ->
 			assert.equals Basset.defaultOptions.repeatNum, 1
-			assert.equals Basset.defaultOptions.reporter, 'plain'
-			assert.equals Basset.defaultOptions.info, 'short'
 
 		'test constructor options': ->
 			basset = new Basset 'http://example.com',
 				repeatNum: 3
 			assert.equals basset.options.repeatNum, 3
 
-		'test invalid reporter': ->
-			@Factory = Object.create ReporterFactory
-			@Factory.reporters = []
-			assert.exception =>
-				basset = new Basset 'http://example.com',
-					ReporterFactory: @Factory
- 
 	'test get sniffers': ->
 		assert.equals @basset.getSniffers().length, 2
 
 	'sniff':
 		setUp: ->
-			for sniffer in @basset.getSniffers()
-				sinon.stub sniffer, 'run'
+			for sniffer, index in @basset.getSniffers()
+				do (sniffer, index) =>
+					sniffer.runCallback = sinon.spy()
+					sinon.stub sniffer, 'run', (callback = ->) =>
+						setTimeout =>
+							sniffer.runCallback()
+							if index == 0 then callback null,
+								onLoad: 4
+							else callback null, 
+								onLoad: 8
+						, 10
 
-		'test all sniffers were called': (done) ->
-			@basset.sniff =>
-				for sniffer in @basset.getSniffers()
-					assert.called sniffer.run
-				done()
+		'run':
+			'test all sniffers were called': (done) ->
+				@basset.on 'done', =>
+					for sniffer in @basset.getSniffers()
+						assert.called sniffer.run
+					done()
+				@basset.sniff()
 
-		'test all sniffers were called with callback': (done) ->
-			@basset.sniff =>
-				for sniffer in @basset.getSniffers()
-					assert.equals typeof sniffer.run.callsArg(0).args[0][0], 'function'
-				done()
+			'test all sniffers were called with callback': (done) ->
+				@basset.on 'done', =>
+					for sniffer in @basset.getSniffers()
+						assert.equals typeof sniffer.run.getCall(0).args[0], 'function'
+					done()
+				@basset.sniff()
 
-		'test call order': (done) ->
-			@basset.sniff =>
-				lastSniffer = null
-				for sniffer in @basset.getSniffers()
-					if lastSniffer then assert sniffer.run.calledAfter(lastSniffer.run)
-					lastSniffer = sniffer
-				done()
+			'test call order': (done) ->
+				@basset.on 'done', =>
+					lastSniffer = null
+					for sniffer in @basset.getSniffers()
+						if lastSniffer then assert sniffer.run.calledAfter(lastSniffer.run)
+						lastSniffer = sniffer
+					done()
+				@basset.sniff()
+		
+		'run callback':
+			'test callbacks were called': (done) ->
+				@basset.on 'done', =>
+					for sniffer in @basset.getSniffers()
+						assert.called sniffer.runCallback
+					done()
+				@basset.sniff()
 
-		'test run were in series': (done) ->
-			assert false
-			done()
+			'test were called in series': (done) ->
+				@basset.on 'done', =>
+					sniffers = @basset.getSniffers()
+					assert sniffers[1].run.calledAfter(sniffers[0].runCallback)
+					done()
+				@basset.sniff()
+
+		'events':
+			setUp: ->
+				@spy = sinon.spy()
+
+			'test newTest': (done) ->
+				@basset.on 'newTest', @spy
+				@basset.on 'done', =>
+					assert.calledTwice @spy
+					done()
+				@basset.sniff()
+
+			'done':
+				setUp: (done) ->
+					@basset.on 'done', (stat) =>
+						@stat = stat
+						done()
+					@basset.sniff()
+
+				'test type': ->
+					assert.equals @stat.constructor.name, 'Statistic'
+
+				'test result': ->
+					assert.equals @stat.average().onLoad, 6

@@ -1,14 +1,14 @@
-ReporterFactory = require './reporterFactory'
 Sniffer = require './sniffer'
+Statistic = require './statistic'
+async = require 'async'
+events = require 'events'
 
-class Basset
+class Basset extends events.EventEmitter
 	constructor: (url = null, options = {}) ->
 		unless typeof url is 'string' then throw new Error 'URL required'
-
 		@url = url
 		@options = @createOptions options
 		@sniffers = @createSniffers()
-		@reporter = @options.ReporterFactory.createReporter @options.reporter
 
 	createOptions: (options = {}) ->
 		res = {}
@@ -25,21 +25,23 @@ class Basset
 		res
 
 	createSniffer: ->
-		new @options.Sniffer @url
+		new Sniffer @url
 
 	getSniffers: ->
 		return @sniffers
 
-	sniff: (callback) ->
-		for sniffer in @getSniffers()
-			sniffer.run ->
-		callback()
+	sniff: ->
+		statistic = new Statistic()
+		runs = @getSniffers().map (sniffer) =>
+			(runCallback) =>
+				@emit 'newTest'
+				sniffer.run (err, result) =>
+					statistic.addResult result
+					runCallback()
+		async.series runs, =>
+			@emit 'done', statistic
 
 Basset.defaultOptions =
 	repeatNum: 1
-	reporter: 'plain'
-	info: 'short'
-	ReporterFactory: ReporterFactory
-	Sniffer: Sniffer
 
 module.exports = Basset

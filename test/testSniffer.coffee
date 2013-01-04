@@ -2,10 +2,11 @@ buster = require 'buster'
 sinon = require 'sinon'
 sandbox = require 'sandboxed-module'
 path = require 'path'
+Result = require '../lib/result'
 
 execError = -> null
 execStdout = -> '{}'
-execSpy = sinon.spy (command, callback = ->) ->
+execSpy = sinon.spy (command, options, callback = ->) ->
 	callback(execError(), execStdout())
 
 Sniffer = sandbox.require '../lib/sniffer'
@@ -32,11 +33,6 @@ buster.testCase 'Sniffer test case',
 	'run':
 		setUp: ->
 			@spy = sinon.spy() 
-			@getResultsFromHarSpy = sinon.spy()
-			sinon.stub Sniffer, 'getResultsFromHar'
-
-		tearDown: ->
-			Sniffer.getResultsFromHar.restore()
 
 		'test runs phantomjs': ->
 			netsniffPath = path.resolve __dirname, '../vendor/netsniff.js'
@@ -53,14 +49,8 @@ buster.testCase 'Sniffer test case',
 			execError = ->	error
 			@sniffer.run @spy
 			assert.calledWith @spy, error
-			refute.called Sniffer.getResultsFromHar
 
 		'test result': ->
-			@sniffer.run()
-			assert.called Sniffer.getResultsFromHar
-
-	'getResultsFromHar':
-		setUp: ->
 			har = 
 				log:
 					pages: [
@@ -68,7 +58,8 @@ buster.testCase 'Sniffer test case',
 							onLoad: 1937
 					],
 					entries: []
-			@result = Sniffer.getResultsFromHar har
-
-		'test page load': ->
-			assert.equals @result.onLoad, 1937
+			execStdout = ->
+				JSON.stringify har
+			@sniffer.run @spy
+			assert.calledWith @spy, null
+			assert @spy.getCall(0).args[1].constructor.name is 'Result'

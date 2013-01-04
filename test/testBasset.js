@@ -1,6 +1,4 @@
-var Basset, FooSniffer, Reporter, ReporterFactory, Sniffer, buster, sandbox, sinon,
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+var Basset, Reporter, ReporterFactory, Sniffer, buster, sandbox, sinon;
 
 buster = require('buster');
 
@@ -14,27 +12,7 @@ Reporter = require('../lib/reporter/reporter');
 
 Sniffer = require('../lib/sniffer');
 
-FooSniffer = (function(_super) {
-
-  __extends(FooSniffer, _super);
-
-  function FooSniffer() {
-    return FooSniffer.__super__.constructor.apply(this, arguments);
-  }
-
-  FooSniffer.prototype.run = function(callback) {
-    return setTimeout(callback, 1);
-  };
-
-  return FooSniffer;
-
-})(Sniffer);
-
-Basset = sandbox.require('../lib/basset', {
-  requires: {
-    sniffer: FooSniffer
-  }
-});
+Basset = require('../lib/basset');
 
 buster.testCase('Basset test case', {
   setUp: function() {
@@ -58,9 +36,7 @@ buster.testCase('Basset test case', {
   },
   'options': {
     'test default options': function() {
-      assert.equals(Basset.defaultOptions.repeatNum, 1);
-      assert.equals(Basset.defaultOptions.reporter, 'plain');
-      return assert.equals(Basset.defaultOptions.info, 'short');
+      return assert.equals(Basset.defaultOptions.repeatNum, 1);
     },
     'test constructor options': function() {
       var basset;
@@ -68,17 +44,6 @@ buster.testCase('Basset test case', {
         repeatNum: 3
       });
       return assert.equals(basset.options.repeatNum, 3);
-    },
-    'test invalid reporter': function() {
-      var _this = this;
-      this.Factory = Object.create(ReporterFactory);
-      this.Factory.reporters = [];
-      return assert.exception(function() {
-        var basset;
-        return basset = new Basset('http://example.com', {
-          ReporterFactory: _this.Factory
-        });
-      });
     }
   },
   'test get sniffers': function() {
@@ -86,58 +51,134 @@ buster.testCase('Basset test case', {
   },
   'sniff': {
     setUp: function() {
-      var sniffer, _i, _len, _ref, _results;
+      var index, sniffer, _i, _len, _ref, _results,
+        _this = this;
       _ref = this.basset.getSniffers();
       _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        sniffer = _ref[_i];
-        _results.push(sinon.stub(sniffer, 'run'));
+      for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+        sniffer = _ref[index];
+        _results.push((function(sniffer, index) {
+          sniffer.runCallback = sinon.spy();
+          return sinon.stub(sniffer, 'run', function(callback) {
+            if (callback == null) {
+              callback = function() {};
+            }
+            return setTimeout(function() {
+              sniffer.runCallback();
+              if (index === 0) {
+                return callback(null, {
+                  onLoad: 4
+                });
+              } else {
+                return callback(null, {
+                  onLoad: 8
+                });
+              }
+            }, 10);
+          });
+        })(sniffer, index));
       }
       return _results;
     },
-    'test all sniffers were called': function(done) {
-      var _this = this;
-      return this.basset.sniff(function() {
-        var sniffer, _i, _len, _ref;
-        _ref = _this.basset.getSniffers();
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          sniffer = _ref[_i];
-          assert.called(sniffer.run);
-        }
-        return done();
-      });
-    },
-    'test all sniffers were called with callback': function(done) {
-      var _this = this;
-      return this.basset.sniff(function() {
-        var sniffer, _i, _len, _ref;
-        _ref = _this.basset.getSniffers();
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          sniffer = _ref[_i];
-          assert.equals(typeof sniffer.run.callsArg(0).args[0][0], 'function');
-        }
-        return done();
-      });
-    },
-    'test call order': function(done) {
-      var _this = this;
-      return this.basset.sniff(function() {
-        var lastSniffer, sniffer, _i, _len, _ref;
-        lastSniffer = null;
-        _ref = _this.basset.getSniffers();
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          sniffer = _ref[_i];
-          if (lastSniffer) {
-            assert(sniffer.run.calledAfter(lastSniffer.run));
+    'run': {
+      'test all sniffers were called': function(done) {
+        var _this = this;
+        this.basset.on('done', function() {
+          var sniffer, _i, _len, _ref;
+          _ref = _this.basset.getSniffers();
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            sniffer = _ref[_i];
+            assert.called(sniffer.run);
           }
-          lastSniffer = sniffer;
-        }
-        return done();
-      });
+          return done();
+        });
+        return this.basset.sniff();
+      },
+      'test all sniffers were called with callback': function(done) {
+        var _this = this;
+        this.basset.on('done', function() {
+          var sniffer, _i, _len, _ref;
+          _ref = _this.basset.getSniffers();
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            sniffer = _ref[_i];
+            assert.equals(typeof sniffer.run.getCall(0).args[0], 'function');
+          }
+          return done();
+        });
+        return this.basset.sniff();
+      },
+      'test call order': function(done) {
+        var _this = this;
+        this.basset.on('done', function() {
+          var lastSniffer, sniffer, _i, _len, _ref;
+          lastSniffer = null;
+          _ref = _this.basset.getSniffers();
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            sniffer = _ref[_i];
+            if (lastSniffer) {
+              assert(sniffer.run.calledAfter(lastSniffer.run));
+            }
+            lastSniffer = sniffer;
+          }
+          return done();
+        });
+        return this.basset.sniff();
+      }
     },
-    'test run were in series': function(done) {
-      assert(false);
-      return done();
+    'run callback': {
+      'test callbacks were called': function(done) {
+        var _this = this;
+        this.basset.on('done', function() {
+          var sniffer, _i, _len, _ref;
+          _ref = _this.basset.getSniffers();
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            sniffer = _ref[_i];
+            assert.called(sniffer.runCallback);
+          }
+          return done();
+        });
+        return this.basset.sniff();
+      },
+      'test were called in series': function(done) {
+        var _this = this;
+        this.basset.on('done', function() {
+          var sniffers;
+          sniffers = _this.basset.getSniffers();
+          assert(sniffers[1].run.calledAfter(sniffers[0].runCallback));
+          return done();
+        });
+        return this.basset.sniff();
+      }
+    },
+    'events': {
+      setUp: function() {
+        return this.spy = sinon.spy();
+      },
+      'test newTest': function(done) {
+        var _this = this;
+        this.basset.on('newTest', this.spy);
+        this.basset.on('done', function() {
+          assert.calledTwice(_this.spy);
+          return done();
+        });
+        return this.basset.sniff();
+      },
+      'done': {
+        setUp: function(done) {
+          var _this = this;
+          this.basset.on('done', function(stat) {
+            _this.stat = stat;
+            return done();
+          });
+          return this.basset.sniff();
+        },
+        'test type': function() {
+          return assert.equals(this.stat.constructor.name, 'Statistic');
+        },
+        'test result': function() {
+          return assert.equals(this.stat.average().onLoad, 6);
+        }
+      }
     }
   }
 });
