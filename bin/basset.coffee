@@ -15,15 +15,12 @@ optimist = require('optimist')
 
   .string('r')
   .alias('r', 'reporter')
-  .describe('r', 'Reporter [plain, json]')
-  .default('r', 'plain')
+  .describe('r', 'Reporter [minimal, full]')
+  .default('r', 'full')
 
   .check((args) ->
     if args.n and (parseInt(args.n, 10).toString() isnt args.n)
       throw new Error 'Num must be a decimal number'
-
-    if args.r and (args.r not in ['plain', 'json'])
-      throw new Error "Invalid reporter: #{args.r}"
   )
 
 argv = optimist.argv
