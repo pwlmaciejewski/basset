@@ -1,4 +1,4 @@
-var Result, Sniffer, buster, execError, execSpy, execStdout, path, sandbox, sinon;
+var HarResult, Sniffer, buster, execError, execSpy, execStdout, path, sandbox, sinon;
 
 buster = require('buster');
 
@@ -8,7 +8,7 @@ sandbox = require('sandboxed-module');
 
 path = require('path');
 
-Result = require('../lib/result');
+HarResult = require('../lib/harResult');
 
 execError = function() {
   return null;
@@ -101,7 +101,14 @@ buster.testCase('Sniffer test case', {
       };
       this.sniffer.run(this.spy);
       assert.calledWith(this.spy, null);
-      return assert(this.spy.getCall(0).args[1].constructor.name === 'Result');
+      return assert(this.spy.getCall(0).args[1].constructor.name === 'HarResult');
+    },
+    'test unparsable stdout': function() {
+      execStdout = function() {
+        return '!@#$%';
+      };
+      this.sniffer.run(this.spy);
+      return assert.equals(this.spy.getCall(0).args[0].constructor.name, 'Error');
     }
   }
 });

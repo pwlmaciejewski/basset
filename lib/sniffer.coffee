@@ -1,7 +1,7 @@
 exec = require('child_process').exec
 path = require 'path'
 netsnifferPath = path.resolve __dirname, '../vendor/netsniff.js'
-Result = require './result'
+HarResult = require './harResult'
 
 class Sniffer
 	constructor: (url = null) ->
@@ -12,11 +12,16 @@ class Sniffer
 		exec 'phantomjs ' + netsnifferPath + ' ' + @url, {
 			maxBuffer: 1024 * 1024 
 		}, (err, stdout) =>
-			har = JSON.parse(stdout)
-			if err or not Result.isValidHar(har) 
+			try
+				har = JSON.parse(stdout)
+			catch e
+				callback new Error 'Unparsable output'
+				return 
+
+			if err or not HarResult.isValidHar(har) 
 				callback err
 			else
-				result = new Result()
+				result = new HarResult()
 				result.feedWithHar har
 				callback null, result
 

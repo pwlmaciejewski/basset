@@ -34,12 +34,16 @@ class Basset extends events.EventEmitter
 		statistic = new Statistic()
 		runs = @getSniffers().map (sniffer) =>
 			(runCallback) =>
-				@emit 'newTest'
+				@emit 'start'
 				sniffer.run (err, result) =>
-					statistic.addResult result
+					@emit 'stop'
+					if err then @emit 'failure', err
+					else if result
+						statistic.addResult result
+						@emit 'result', result
 					runCallback()
 		async.series runs, =>
-			@emit 'done', statistic
+			@emit 'end', statistic
 
 Basset.defaultOptions =
 	repeatNum: 1

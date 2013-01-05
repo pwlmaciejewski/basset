@@ -1,13 +1,13 @@
 buster = require 'buster'
 Statistic = require '../lib/statistic'
-Result = require '../lib/result'
+HarResult = require '../lib/harResult'
 
 buster.testCase 'Statistic test case',
   setUp: ->
     @statistic = new Statistic()
-    result1 = new Result
+    result1 = new HarResult
       onLoad: 2
-    result2 = new Result
+    result2 = new HarResult
       onLoad: 3
     @statistic.addResult result1
     @statistic.addResult result2
@@ -28,11 +28,18 @@ buster.testCase 'Statistic test case',
       @average = @statistic.average()
 
     'test type': ->
-      assert.equals @average.constructor.name, 'Result'
+      assert.equals @average.constructor.name, 'HarResult'
 
     'test result': ->
-      assert.equals @statistic.average().onLoad, 2.5    
+      assert.equals @statistic.average().getValue('onLoad'), 2.5    
 
     'test empty results': ->
       statistic = new Statistic()
-      assert.equals statistic.average().onLoad, 0
+      assert.equals statistic.average().getValue('onLoad'), 0
+
+  'deviation':
+    setUp: ->
+      @deviation = @statistic.deviation()
+
+    # 'test type': ->
+    #   assert.equals @deviation.constructor.name, 'Result'

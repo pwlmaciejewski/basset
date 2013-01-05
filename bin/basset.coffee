@@ -1,3 +1,5 @@
+ReporterFactory = require '../lib/reporterFactory'
+Basset = require '../lib/basset'
 optimist = require('optimist')
   .usage('basset [options] url')
   .demand(1)
@@ -9,14 +11,12 @@ optimist = require('optimist')
   .string('n')
   .alias('n', 'num')
   .describe('n', 'Num of repeats')
+  .default('n', '1')
 
   .string('r')
   .alias('r', 'reporter')
-  .describe('r', 'Reporter [plain (default), json]')
-
-  .string('s')
-  .alias('s', 'output-size')
-  .describe('s', 'Output size [short (default)]')
+  .describe('r', 'Reporter [plain, json]')
+  .default('r', 'plain')
 
   .check((args) ->
     if args.n and (parseInt(args.n, 10).toString() isnt args.n)
@@ -24,9 +24,6 @@ optimist = require('optimist')
 
     if args.r and (args.r not in ['plain', 'json'])
       throw new Error "Invalid reporter: #{args.r}"
-
-    if args.s and (args.s not in ['short'])
-      throw new Error "Invalid output size: #{args.s}"
   )
 
 argv = optimist.argv
@@ -35,11 +32,8 @@ if (argv.h)
   optimist.showHelp()
   process.exit()
 
-options = {}
-if argv.n then options.repeatNum = parseInt(argv.n, 10)
-if argv.r then options.reporter = argv.r
-if argv.s then options.info = argv.s
-
-Basset = require '../lib/basset'
-basset = new Basset argv._[0], options
+basset = new Basset argv._[0], 
+  repeatNum: argv.n
+reporter = ReporterFactory.createReporter argv.r
+reporter.bind basset
 basset.sniff()

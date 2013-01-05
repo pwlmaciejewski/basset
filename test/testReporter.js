@@ -14,23 +14,35 @@ buster.testCase('Reporter test case', {
     return this.reporter = new Reporter();
   },
   'bind': {
+    setUp: function() {
+      var _this = this;
+      return this.testBond = function(event, methodName) {
+        sinon.stub(_this.reporter, methodName);
+        _this.reporter.bind(_this.basset);
+        _this.basset.emit(event);
+        return assert.called(_this.reporter[methodName]);
+      };
+    },
     'test arg must be a Basset instance': function() {
       var _this = this;
       return assert.exception(function() {
         return _this.reporter.bind({});
       });
     },
-    'test call new test': function() {
-      sinon.stub(this.reporter, 'onNewTest');
-      this.reporter.bind(this.basset);
-      this.basset.emit('newTest');
-      return assert.called(this.reporter.onNewTest);
+    'test call start': function() {
+      return this.testBond('start', 'onStart');
     },
-    'test call done': function() {
-      sinon.stub(this.reporter, 'onDone');
-      this.reporter.bind(this.basset);
-      this.basset.emit('done');
-      return assert.called(this.reporter.onDone);
+    'test call stop': function() {
+      return this.testBond('stop', 'onStop');
+    },
+    'test call end': function() {
+      return this.testBond('end', 'onEnd');
+    },
+    'test call result': function() {
+      return this.testBond('result', 'onResult');
+    },
+    'test call failure': function() {
+      return this.testBond('failure', 'onFailure');
     }
   }
 });

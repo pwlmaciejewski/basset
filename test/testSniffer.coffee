@@ -2,7 +2,7 @@ buster = require 'buster'
 sinon = require 'sinon'
 sandbox = require 'sandboxed-module'
 path = require 'path'
-Result = require '../lib/result'
+HarResult = require '../lib/harResult'
 
 execError = -> null
 execStdout = -> '{}'
@@ -62,4 +62,10 @@ buster.testCase 'Sniffer test case',
 				JSON.stringify har
 			@sniffer.run @spy
 			assert.calledWith @spy, null
-			assert @spy.getCall(0).args[1].constructor.name is 'Result'
+			assert @spy.getCall(0).args[1].constructor.name is 'HarResult'
+
+		'test unparsable stdout': ->
+			execStdout = ->
+				'!@#$%'
+			@sniffer.run @spy
+			assert.equals @spy.getCall(0).args[0].constructor.name, 'Error'

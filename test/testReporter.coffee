@@ -9,18 +9,28 @@ buster.testCase 'Reporter test case',
     @reporter = new Reporter()
 
   'bind':
+    setUp: ->
+      @testBond = (event, methodName) =>
+        sinon.stub @reporter, methodName
+        @reporter.bind @basset
+        @basset.emit event
+        assert.called @reporter[methodName]
+        
     'test arg must be a Basset instance': ->
       assert.exception =>
         @reporter.bind {}
 
-    'test call new test': ->
-      sinon.stub @reporter, 'onNewTest'
-      @reporter.bind @basset
-      @basset.emit 'newTest'
-      assert.called @reporter.onNewTest
+    'test call start': ->
+      @testBond 'start', 'onStart'
 
-    'test call done': ->
-      sinon.stub @reporter, 'onDone'
-      @reporter.bind @basset
-      @basset.emit 'done'
-      assert.called @reporter.onDone
+    'test call stop': ->
+      @testBond 'stop', 'onStop'
+
+    'test call end': ->
+      @testBond 'end', 'onEnd'
+
+    'test call result': ->
+      @testBond 'result', 'onResult'
+
+    'test call failure': ->
+      @testBond 'failure', 'onFailure'

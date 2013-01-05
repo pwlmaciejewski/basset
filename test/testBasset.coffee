@@ -1,15 +1,14 @@
-buster = require 'buster'
+startbuster = require 'buster'
 sinon = require 'sinon'
 sandbox = require 'sandboxed-module'
-ReporterFactory = require '../lib/reporterFactory'
-Reporter = require '../lib/reporter/reporter'
 Sniffer = require '../lib/sniffer'
 Basset = require '../lib/basset'
+HarResult = require '../lib/harResult'
 
 buster.testCase 'Basset test case', 
 	setUp: ->
 		@basset = new Basset 'http://example.com'
-			repeatNum: 2
+			repeatNum: 3
 
 	'first argument (url)':
 		'test is required': ->
@@ -26,11 +25,11 @@ buster.testCase 'Basset test case',
 
 		'test constructor options': ->
 			basset = new Basset 'http://example.com',
-				repeatNum: 3
-			assert.equals basset.options.repeatNum, 3
+				repeatNum: 5
+			assert.equals basset.options.repeatNum, 5
 
 	'test get sniffers': ->
-		assert.equals @basset.getSniffers().length, 2
+		assert.equals @basset.getSniffers().length, 3
 
 	'sniff':
 		setUp: ->
@@ -40,29 +39,28 @@ buster.testCase 'Basset test case',
 					sinon.stub sniffer, 'run', (callback = ->) =>
 						setTimeout =>
 							sniffer.runCallback()
-							if index == 0 then callback null,
-								onLoad: 4
-							else callback null, 
-								onLoad: 8
+							if index == 0 then callback null, new HarResult({ onLoad: 4 })
+							else if index == 1 then callback null, new HarResult({ onLoad: 8 })
+							else callback new Error 'Something gone wrong'
 						, 10
 
 		'run':
 			'test all sniffers were called': (done) ->
-				@basset.on 'done', =>
+				@basset.on 'end', =>
 					for sniffer in @basset.getSniffers()
 						assert.called sniffer.run
 					done()
 				@basset.sniff()
 
 			'test all sniffers were called with callback': (done) ->
-				@basset.on 'done', =>
+				@basset.on 'end', =>
 					for sniffer in @basset.getSniffers()
 						assert.equals typeof sniffer.run.getCall(0).args[0], 'function'
 					done()
 				@basset.sniff()
 
 			'test call order': (done) ->
-				@basset.on 'done', =>
+				@basset.on 'end', =>
 					lastSniffer = null
 					for sniffer in @basset.getSniffers()
 						if lastSniffer then assert sniffer.run.calledAfter(lastSniffer.run)
@@ -72,14 +70,14 @@ buster.testCase 'Basset test case',
 		
 		'run callback':
 			'test callbacks were called': (done) ->
-				@basset.on 'done', =>
+				@basset.on 'end', =>
 					for sniffer in @basset.getSniffers()
 						assert.called sniffer.runCallback
 					done()
 				@basset.sniff()
 
 			'test were called in series': (done) ->
-				@basset.on 'done', =>
+				@basset.on 'end', =>
 					sniffers = @basset.getSniffers()
 					assert sniffers[1].run.calledAfter(sniffers[0].runCallback)
 					done()
@@ -89,16 +87,53 @@ buster.testCase 'Basset test case',
 			setUp: ->
 				@spy = sinon.spy()
 
-			'test newTest': (done) ->
-				@basset.on 'newTest', @spy
-				@basset.on 'done', =>
-					assert.calledTwice @spy
+			'test start': (done) ->
+				@basset.on 'start', @spy
+				@basset.on 'end', =>
+					assert.calledThrice @spy
 					done()
 				@basset.sniff()
 
-			'done':
+			'test stop': (done) ->
+				@basset.on 'stop', @spy
+				@basset.on 'end', =>
+					assert.calledThrice @spy
+					done()
+				@basset.sniff()
+
+			'test failure': 
 				setUp: (done) ->
-					@basset.on 'done', (stat) =>
+					@basset.on 'failure', @spy
+					@basset.on 'end', (err) =>
+						done()
+					@basset.sniff()
+
+				'test called once': ->
+					assert.calledOnce @spy
+
+				'test called with error': ->
+					err = @spy.getCall(0).args[0]
+					assert err instanceof Error
+
+
+			'test result': 
+				setUp: (done) ->
+					@basset.on 'result', @spy
+					@basset.on 'end', =>
+						done()
+					@basset.sniff()
+
+				'test called twice': ->
+					assert.calledTwice @spy
+
+				'test called with result': ->
+					res = @spy.getCall(0).args[0]
+					assert.equals res.constructor.name, 'HarResult'
+					assert.equals res.getValue('onLoad'), 4
+
+			'end':
+				setUp: (done) ->
+					@basset.on 'end', (stat) =>
 						@stat = stat
 						done()
 					@basset.sniff()
@@ -107,4 +142,4 @@ buster.testCase 'Basset test case',
 					assert.equals @stat.constructor.name, 'Statistic'
 
 				'test result': ->
-					assert.equals @stat.average().onLoad, 6
+					assert.equals @stat.average().getValue('onLoad'), 6

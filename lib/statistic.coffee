@@ -1,4 +1,4 @@
-Result = require './result'
+HarResult = require './harResult'
 
 class Statistic
   constructor: (results = []) ->
@@ -9,11 +9,15 @@ class Statistic
     @results.push result
 
   average: ->
-    result = new Result()
+    result = new HarResult()
     if @results.length
       for r in @results
-        result = Result.add result, r
-      result.onLoad /= @results.length
+        result = HarResult.add result, r
+      result = HarResult.divideBy result, @results.length
+    result
+
+  deviation: ->
+    result = new Result()
     result
 
 module.exports = Statistic

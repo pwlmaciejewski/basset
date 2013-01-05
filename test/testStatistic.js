@@ -1,19 +1,19 @@
-var Result, Statistic, buster;
+var HarResult, Statistic, buster;
 
 buster = require('buster');
 
 Statistic = require('../lib/statistic');
 
-Result = require('../lib/result');
+HarResult = require('../lib/harResult');
 
 buster.testCase('Statistic test case', {
   setUp: function() {
     var result1, result2;
     this.statistic = new Statistic();
-    result1 = new Result({
+    result1 = new HarResult({
       onLoad: 2
     });
-    result2 = new Result({
+    result2 = new HarResult({
       onLoad: 3
     });
     this.statistic.addResult(result1);
@@ -38,15 +38,20 @@ buster.testCase('Statistic test case', {
       return this.average = this.statistic.average();
     },
     'test type': function() {
-      return assert.equals(this.average.constructor.name, 'Result');
+      return assert.equals(this.average.constructor.name, 'HarResult');
     },
     'test result': function() {
-      return assert.equals(this.statistic.average().onLoad, 2.5);
+      return assert.equals(this.statistic.average().getValue('onLoad'), 2.5);
     },
     'test empty results': function() {
       var statistic;
       statistic = new Statistic();
-      return assert.equals(statistic.average().onLoad, 0);
+      return assert.equals(statistic.average().getValue('onLoad'), 0);
+    }
+  },
+  'deviation': {
+    setUp: function() {
+      return this.deviation = this.statistic.deviation();
     }
   }
 });

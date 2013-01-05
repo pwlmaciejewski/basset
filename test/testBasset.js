@@ -1,23 +1,21 @@
-var Basset, Reporter, ReporterFactory, Sniffer, buster, sandbox, sinon;
+var Basset, HarResult, Sniffer, sandbox, sinon, startbuster;
 
-buster = require('buster');
+startbuster = require('buster');
 
 sinon = require('sinon');
 
 sandbox = require('sandboxed-module');
 
-ReporterFactory = require('../lib/reporterFactory');
-
-Reporter = require('../lib/reporter/reporter');
-
 Sniffer = require('../lib/sniffer');
 
 Basset = require('../lib/basset');
 
+HarResult = require('../lib/harResult');
+
 buster.testCase('Basset test case', {
   setUp: function() {
     return this.basset = new Basset('http://example.com', {
-      repeatNum: 2
+      repeatNum: 3
     });
   },
   'first argument (url)': {
@@ -41,13 +39,13 @@ buster.testCase('Basset test case', {
     'test constructor options': function() {
       var basset;
       basset = new Basset('http://example.com', {
-        repeatNum: 3
+        repeatNum: 5
       });
-      return assert.equals(basset.options.repeatNum, 3);
+      return assert.equals(basset.options.repeatNum, 5);
     }
   },
   'test get sniffers': function() {
-    return assert.equals(this.basset.getSniffers().length, 2);
+    return assert.equals(this.basset.getSniffers().length, 3);
   },
   'sniff': {
     setUp: function() {
@@ -66,13 +64,15 @@ buster.testCase('Basset test case', {
             return setTimeout(function() {
               sniffer.runCallback();
               if (index === 0) {
-                return callback(null, {
+                return callback(null, new HarResult({
                   onLoad: 4
-                });
-              } else {
-                return callback(null, {
+                }));
+              } else if (index === 1) {
+                return callback(null, new HarResult({
                   onLoad: 8
-                });
+                }));
+              } else {
+                return callback(new Error('Something gone wrong'));
               }
             }, 10);
           });
@@ -83,7 +83,7 @@ buster.testCase('Basset test case', {
     'run': {
       'test all sniffers were called': function(done) {
         var _this = this;
-        this.basset.on('done', function() {
+        this.basset.on('end', function() {
           var sniffer, _i, _len, _ref;
           _ref = _this.basset.getSniffers();
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -96,7 +96,7 @@ buster.testCase('Basset test case', {
       },
       'test all sniffers were called with callback': function(done) {
         var _this = this;
-        this.basset.on('done', function() {
+        this.basset.on('end', function() {
           var sniffer, _i, _len, _ref;
           _ref = _this.basset.getSniffers();
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -109,7 +109,7 @@ buster.testCase('Basset test case', {
       },
       'test call order': function(done) {
         var _this = this;
-        this.basset.on('done', function() {
+        this.basset.on('end', function() {
           var lastSniffer, sniffer, _i, _len, _ref;
           lastSniffer = null;
           _ref = _this.basset.getSniffers();
@@ -128,7 +128,7 @@ buster.testCase('Basset test case', {
     'run callback': {
       'test callbacks were called': function(done) {
         var _this = this;
-        this.basset.on('done', function() {
+        this.basset.on('end', function() {
           var sniffer, _i, _len, _ref;
           _ref = _this.basset.getSniffers();
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -141,7 +141,7 @@ buster.testCase('Basset test case', {
       },
       'test were called in series': function(done) {
         var _this = this;
-        this.basset.on('done', function() {
+        this.basset.on('end', function() {
           var sniffers;
           sniffers = _this.basset.getSniffers();
           assert(sniffers[1].run.calledAfter(sniffers[0].runCallback));
@@ -154,19 +154,65 @@ buster.testCase('Basset test case', {
       setUp: function() {
         return this.spy = sinon.spy();
       },
-      'test newTest': function(done) {
+      'test start': function(done) {
         var _this = this;
-        this.basset.on('newTest', this.spy);
-        this.basset.on('done', function() {
-          assert.calledTwice(_this.spy);
+        this.basset.on('start', this.spy);
+        this.basset.on('end', function() {
+          assert.calledThrice(_this.spy);
           return done();
         });
         return this.basset.sniff();
       },
-      'done': {
+      'test stop': function(done) {
+        var _this = this;
+        this.basset.on('stop', this.spy);
+        this.basset.on('end', function() {
+          assert.calledThrice(_this.spy);
+          return done();
+        });
+        return this.basset.sniff();
+      },
+      'test failure': {
         setUp: function(done) {
           var _this = this;
-          this.basset.on('done', function(stat) {
+          this.basset.on('failure', this.spy);
+          this.basset.on('end', function(err) {
+            return done();
+          });
+          return this.basset.sniff();
+        },
+        'test called once': function() {
+          return assert.calledOnce(this.spy);
+        },
+        'test called with error': function() {
+          var err;
+          err = this.spy.getCall(0).args[0];
+          return assert(err instanceof Error);
+        }
+      },
+      'test result': {
+        setUp: function(done) {
+          var _this = this;
+          this.basset.on('result', this.spy);
+          this.basset.on('end', function() {
+            return done();
+          });
+          return this.basset.sniff();
+        },
+        'test called twice': function() {
+          return assert.calledTwice(this.spy);
+        },
+        'test called with result': function() {
+          var res;
+          res = this.spy.getCall(0).args[0];
+          assert.equals(res.constructor.name, 'HarResult');
+          return assert.equals(res.getValue('onLoad'), 4);
+        }
+      },
+      'end': {
+        setUp: function(done) {
+          var _this = this;
+          this.basset.on('end', function(stat) {
             _this.stat = stat;
             return done();
           });
@@ -176,7 +222,7 @@ buster.testCase('Basset test case', {
           return assert.equals(this.stat.constructor.name, 'Statistic');
         },
         'test result': function() {
-          return assert.equals(this.stat.average().onLoad, 6);
+          return assert.equals(this.stat.average().getValue('onLoad'), 6);
         }
       }
     }
