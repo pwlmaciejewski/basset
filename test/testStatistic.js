@@ -41,7 +41,7 @@ buster.testCase('Statistic test case', {
       return assert.equals(this.average.constructor.name, 'HarResult');
     },
     'test result': function() {
-      return assert.equals(this.statistic.average().getValue('onLoad'), 2.5);
+      return assert.equals(this.average.getValue('onLoad'), 2.5);
     },
     'test empty results': function() {
       var statistic;
@@ -52,6 +52,12 @@ buster.testCase('Statistic test case', {
   'deviation': {
     setUp: function() {
       return this.deviation = this.statistic.deviation();
+    },
+    'test type': function() {
+      return assert.equals(this.deviation.constructor.name, 'HarResult');
+    },
+    'test result': function() {
+      return assert.equals(this.deviation.getValue('onLoad'), 0.5);
     }
   }
 });

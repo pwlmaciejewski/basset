@@ -17,7 +17,13 @@ class Statistic
     result
 
   deviation: ->
-    result = new Result()
-    result
+    result = new HarResult()
+    average = @average()
+    for r in @results
+      tmp = HarResult.substract average, r
+      tmp = HarResult.pow tmp, 2
+      result = HarResult.add result, tmp
+    result = HarResult.divideBy result, @results.length
+    HarResult.sqrt result
 
 module.exports = Statistic

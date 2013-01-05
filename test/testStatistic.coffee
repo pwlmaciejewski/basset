@@ -31,7 +31,7 @@ buster.testCase 'Statistic test case',
       assert.equals @average.constructor.name, 'HarResult'
 
     'test result': ->
-      assert.equals @statistic.average().getValue('onLoad'), 2.5    
+      assert.equals @average.getValue('onLoad'), 2.5    
 
     'test empty results': ->
       statistic = new Statistic()
@@ -41,5 +41,8 @@ buster.testCase 'Statistic test case',
     setUp: ->
       @deviation = @statistic.deviation()
 
-    # 'test type': ->
-    #   assert.equals @deviation.constructor.name, 'Result'
+    'test type': ->
+      assert.equals @deviation.constructor.name, 'HarResult'
+
+    'test result': ->
+      assert.equals @deviation.getValue('onLoad'), 0.5

@@ -18,7 +18,8 @@ class PlainReporter extends Reporter
 
 	onEnd: (results) ->
 		avg = results.average()
+		deviation = results.deviation()
 		console.log ''
-		console.log "Average onLoad: #{avg.getValue('onLoad')} ms"
+		console.log "Average onLoad: #{avg.getValue('onLoad')} \u00B1 #{deviation.getValue('onLoad').toFixed(2)} ms"
 
 module.exports = PlainReporter

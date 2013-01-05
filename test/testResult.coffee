@@ -79,6 +79,10 @@ buster.testCase 'Result test case',
 			res = FooResult.add {	foo: 1,	bar: 2 }, {	bar: 3, baz: 4 }
 			assert.equals res.getValues(), { foo: 1, bar: 5, baz: 4 }
 
+		'substract': ->
+			res = FooResult.substract { foo: 3 }, { foo: 1 }
+			assert.equals res.getValues(), { foo: 2, bar: 0, baz: 0 }
+
 		'test divide by': ->
 			res = FooResult.divideBy { foo: 3 }, 2
 			assert.equals res.getValues(), { foo: 1.5, bar: 0, baz: 0 }
@@ -91,3 +95,7 @@ buster.testCase 'Result test case',
 			'test power 2': ->
 				res = FooResult.pow { foo: 5 }, 2
 				assert res.getValue('foo'), 25
+
+		'test sqrt': ->
+			res = FooResult.sqrt { foo: 4 }
+			assert.equals res.getValues(), { foo: 2, bar: 0, baz: 0 }

@@ -43,6 +43,12 @@ Result.add = (first, second) ->
   new @().mapValues (name) ->
     first.getValue(name) + second.getValue(name)
 
+Result.substract = (first, second) ->
+  first = new @(first)
+  second = new @(second)
+  new @().mapValues (name) ->
+    first.getValue(name) - second.getValue(name)  
+
 Result.divideBy = (first, divider) ->
   first = new @(first)
   new @().mapValues (name) ->
@@ -53,5 +59,10 @@ Result.pow = (first, power) ->
   new @().mapValues (name) ->
     if power == 0 then 1
     else Math.pow first.getValue(name), power
+
+Result.sqrt = (first) ->
+  first = new @(first)
+  new @().mapValues (name) ->
+    Math.sqrt first.getValue(name)
 
 module.exports = Result

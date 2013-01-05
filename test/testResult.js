@@ -135,6 +135,19 @@ buster.testCase('Result test case', {
         baz: 4
       });
     },
+    'substract': function() {
+      var res;
+      res = FooResult.substract({
+        foo: 3
+      }, {
+        foo: 1
+      });
+      return assert.equals(res.getValues(), {
+        foo: 2,
+        bar: 0,
+        baz: 0
+      });
+    },
     'test divide by': function() {
       var res;
       res = FooResult.divideBy({
@@ -161,6 +174,17 @@ buster.testCase('Result test case', {
         }, 2);
         return assert(res.getValue('foo'), 25);
       }
+    },
+    'test sqrt': function() {
+      var res;
+      res = FooResult.sqrt({
+        foo: 4
+      });
+      return assert.equals(res.getValues(), {
+        foo: 2,
+        bar: 0,
+        baz: 0
+      });
     }
   }
 });
