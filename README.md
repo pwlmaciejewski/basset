@@ -122,23 +122,37 @@ Returns a copy of internal `valueNames` array.
 
 ##### `getValue(name)`
 
-Returns value with `name`. If `name` isn't on `valueNames` array it throws an `Error`.
+Returns value with `name`. If `name` isn't in `valueNames` array it throws an `Error`.
 
 ##### `setValue(name, value)`
 
-Sets `value`. If `name` isn't on `valueNames` array it throws an `Error`.
+Sets `value`. If `name` isn't in `valueNames` array it throws an `Error`.
 
 ##### `hasValue(name)`
 
-Returns true if `name` appears on `valuesNames` array.
+Returns true if `name` appears in `valuesNames` array.
 
 ##### `getValues(values)`
 
-Sets values object. If one of the `values` property isn't on `valueNames` it throws an `Error`.
+Sets values object. If one of the `values` property isn't in `valueNames` it throws an `Error`.
 
 ##### other methods
 
 For more information about `Result` class see `lib/result.coffee`.
+
+### HarResult
+
+`HarResult` derives from `Result`. It overrides `valueNames` and defines set of methods to
+feed the object with har json.
+
+##### `feedWithHar(har)`
+
+Accepts an object and gets essential information from it. It `har` isn't a valid
+har object it throws an `Error`.
+
+##### other methods
+
+For more information about `HarResult` class see `lib/harResult.coffee`.
 
 ## Changelog
 
