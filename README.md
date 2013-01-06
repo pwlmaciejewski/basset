@@ -13,7 +13,7 @@ npm install -g basset
 
 **Caution!** Remember that you need to have `phantomjs` command in your `PATH`. 
 
-## Usage
+## Command-line usage
 
 ```
 basset -n 10 http://bbc.com
@@ -26,6 +26,9 @@ Average
 For more info: `basset -h`
 
 ## Documentation
+
+Basset is designed to be a command-line tool which can be easily
+used as a node module, so don't be affraid to `require('basset')` in your project.
 
 ### Basset class
 
