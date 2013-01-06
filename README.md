@@ -109,6 +109,37 @@ Passes `Error` instance to handler function.
 
 Emitted after test stop (after `failure` or `result` event).
 
+### Result class
+
+`Result` class represents a set of results. It has an array of `valueNames`
+and you can assign only values from that array. It means that if `valueNames = ['foo']`
+you can `setValue('foo', 1)` but not `setValue('bar', 1)`. By default `valueNames` is empty,
+so you need to derive from `Result` to create something functional.
+
+##### `getValueNames`
+
+Returns a copy of internal `valueNames` array.
+
+##### `getValue(name)`
+
+Returns value with `name`. If `name` isn't on `valueNames` array it throws an `Error`.
+
+##### `setValue(name, value)`
+
+Sets `value`. If `name` isn't on `valueNames` array it throws an `Error`.
+
+##### `hasValue(name)`
+
+Returns true if `name` appears on `valuesNames` array.
+
+##### `getValues(values)`
+
+Sets values object. If one of the `values` property isn't on `valueNames` it throws an `Error`.
+
+##### other methods
+
+For more information about `Result` class see `lib/result.coffee`.
+
 ## Changelog
 
 `0.0.1` - Initial release
