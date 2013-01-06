@@ -1,14 +1,8 @@
 buster = require 'buster'
 ReporterFactory = require '../lib/reporterFactory'
 Reporter = require '../lib/reporter/reporter'
-PlainReporter = require '../lib/reporter/plain'
-JsonReporter = require '../lib/reporter/json'
 
-buster.testCase 'Reporter factory test case', 
-	'test default reporters': ->
-		assert.equals ReporterFactory.reporters, 
-			plain: PlainReporter
-			json: JsonReporter
+buster.testCase 'Reporter factory test case',
 
 	'create reporter':
 		setUp: ->

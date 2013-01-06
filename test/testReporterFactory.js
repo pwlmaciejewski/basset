@@ -1,4 +1,4 @@
-var JsonReporter, PlainReporter, Reporter, ReporterFactory, buster;
+var Reporter, ReporterFactory, buster;
 
 buster = require('buster');
 
@@ -6,17 +6,7 @@ ReporterFactory = require('../lib/reporterFactory');
 
 Reporter = require('../lib/reporter/reporter');
 
-PlainReporter = require('../lib/reporter/plain');
-
-JsonReporter = require('../lib/reporter/json');
-
 buster.testCase('Reporter factory test case', {
-  'test default reporters': function() {
-    return assert.equals(ReporterFactory.reporters, {
-      plain: PlainReporter,
-      json: JsonReporter
-    });
-  },
   'create reporter': {
     setUp: function() {
       this.Factory = Object.create(ReporterFactory);

@@ -4,13 +4,7 @@ HarResult = require '../lib/harResult'
 buster.testCase 'Result test case',
 	setUp: ->
 		@result = new HarResult()
-		@har = 
-			log:
-				pages: [
-					pageTimings:
-						onLoad: 1937
-				],
-				entries: [] 
+		@har = require './fixture/bbc.har.json'
 
 	'is valid har':
 		'test valid': ->
@@ -19,15 +13,35 @@ buster.testCase 'Result test case',
 		'test invalid har': ->
 			refute HarResult.isValidHar({})
 
-	'test collect values from har': ->
-		values = HarResult.collectValuesFromHar @har
-		assert.equals values,
-			onLoad: 1937
+	'collect values from har':
+		setUp: ->
+			@values = HarResult.collectValuesFromHar @har
+
+		'test onLoad': ->
+			assert.equals @values.onLoad, 3124
+
+		'test requestsNum': ->
+			assert.equals @values.requestsNum, 81
+
+		'test htmlRequestsNum': ->
+			assert.equals @values.htmlRequestsNum, 3
+
+		'test cssRequestsNum': ->
+			assert.equals @values.cssRequestsNum, 4
+
+		'test jsRequestsNum': ->
+			assert.equals @values.jsRequestsNum, 35
+
+		'test imgRequestsNum': ->
+			assert.equals @values.imgRequestsNum, 39
+
+		'test otherRequestsNum': ->
+			assert.equals @values.otherRequestsNum, 0
 
 	'feed with har':
 		'test valid har': ->
 			@result.feedWithHar @har
-			assert.equals @result.getValue('onLoad'), 1937
+			assert.equals @result.getValue('onLoad'), 3124
 
 		'test invalid har': ->
 			assert.exception =>
