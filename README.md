@@ -112,7 +112,7 @@ Emitted after test stop (after `failure` or `result` event).
 ### Result class
 
 `Result` class represents a set of results. It has an array of `valueNames`
-and you can assign only values from that array. It means that if `valueNames = ['foo']`
+and you can set values only from that array. It means that if `valueNames = ['foo']`
 you can `setValue('foo', 1)` but not `setValue('bar', 1)`. By default `valueNames` is empty,
 so you need to derive from `Result` to create something functional.
 
