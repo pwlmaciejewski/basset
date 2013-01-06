@@ -140,10 +140,10 @@ Sets values object. If one of the `values` property isn't in `valueNames` it thr
 
 For more information about `Result` class see `lib/result.coffee`.
 
-### HarResult
+### HarResult class
 
 `HarResult` derives from `Result`. It overrides `valueNames` and defines set of methods to
-feed the object with har json.
+feed the object with a har json.
 
 ##### `feedWithHar(har)`
 
@@ -153,6 +153,23 @@ har object it throws an `Error`.
 ##### other methods
 
 For more information about `HarResult` class see `lib/harResult.coffee`.
+
+### Statistic class
+
+`Statistic` class has many `Result` intances. It can compute average
+and standard deviation from it.
+
+##### `addResult(result)`
+
+Add a `result` to internal `results` array.
+
+##### `average()`
+
+Returns a `Result` instance which represents an average of `results` array items.
+
+##### `deviation()`
+
+Returns a `Result` instance which represent a standard deviation of `results` array items.
 
 ## Changelog
 
