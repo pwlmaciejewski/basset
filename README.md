@@ -50,7 +50,7 @@ Basic example:
 	basset.sniff();
 ```
 
-###### `new Basset(url, options)`
+##### `new Basset(url, options)`
 
 Argument `url` is required, `options` are optional.
 
@@ -60,15 +60,15 @@ Default options:
   repeatNum: 1
 ```
 
-###### `.sniff()`
+##### `.sniff()`
 
 Run all tests (sniffers).
 
-###### `begin` event
+##### `begin` event
 
 Emitted before starting of a first test.
 
-###### `end` event
+##### `end` event
 
 Emitted after all tests stopped. Passes `Statistic` intance to handler function.
 See `Statistic class` for more information.
@@ -82,7 +82,7 @@ See `Statistic class` for more information.
 	basset.sniff();
 ```
 
-###### `testStart` event
+##### `testStart` event
 
 Emitted on test start. Passes `HarResult` instance to handler function.
 See `HarResult class` and `Result class` section for more information.
@@ -95,17 +95,17 @@ See `HarResult class` and `Result class` section for more information.
 	basset.sniff();
 ```
 
-###### `result` event
+##### `result` event
 
 Emitted when test gives valid result. Passes `HarResult` instance to handler function.
 See `HarResult class` and `Result class` section for more informaction.
 
-###### `failure` event
+##### `failure` event
 
 Emitted when test fails (browser error occured or something else gone wrong).
 Passes `Error` instance to handler function.
 
-###### `testStop` event
+##### `testStop` event
 
 Emitted after test stop (after `failure` or `result` event).
 
