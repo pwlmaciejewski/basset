@@ -31,13 +31,13 @@ For more info: `basset -h`
 
 It's extremely easy to use `basset` in your project:
 
-* Basset needs to be initialized with an `url` to test and `options`
-* Method `sniff` starts testing sequence. 
+* Basset needs to be initialized with an `url` and `options`.
+* Method `sniff` starts the testing sequence. 
 * Basset communicates with outer world using events (it derives from `EventEmitter`).
 
 Basic example:
 
-```
+```javascript
 	var basset = new Basset('http://google.com', { repeatNum: 10 });
 	basset.on('done', function () {
 		console.log('done!');
@@ -68,12 +68,21 @@ Emitted before starting of a first test.
 Emitted after all tests stopped. Passes `Statistic` intance to handler function.
 See `Statistic class` for more information.
 
+```javascript
+	var basset = new Basset('http://google.com', { repeatNum: 10 });
+	basset.on('end', function (results) {
+		var avg = results.average();
+		console.log(avg.getValue('onLoad'));
+	});
+	basset.sniff();
+```
+
 #### `testStart` event
 
 Emitted on test start. Passes `HarResult` instance to handler function.
 See `HarResult class` and `Result class` section for more information.
 
-```
+```javascript
 	var basset = new Basset('http://bbc.com');
 	basset.on('testStart', function (result) {
 		console.log(result.getValue('onLoad')); // Prints onLoad time
