@@ -1,12 +1,12 @@
-Reporter = require './reporter'
+PlainReporter = require './plain'
 clc = require 'cli-color'
 
-class PlainReporter extends Reporter
-	constructor: ->
+class MinimalReporter extends PlainReporter
+	onBegin: ->
 		@done = 0
 		@columnWidth = 50
 
-	onStop: ->
+	onTestStart: ->
 		if @done and @done % @columnWidth is 0 then console.log ''		
 		@done += 1
 
@@ -17,9 +17,7 @@ class PlainReporter extends Reporter
 		process.stdout.write clc.redBright.bold('F')
 
 	onEnd: (results) ->
-		avg = results.average()
-		deviation = results.deviation()
 		console.log ''
-		console.log "Average onLoad: #{avg.getValue('onLoad')} \u00B1 #{deviation.getValue('onLoad').toFixed(2)} ms"
+		console.log @getSummaryTable(results)
 
-module.exports = PlainReporter
+module.exports = MinimalReporter

@@ -154,9 +154,18 @@ buster.testCase('Basset test case', {
       setUp: function() {
         return this.spy = sinon.spy();
       },
+      'test begin': function(done) {
+        var _this = this;
+        this.basset.on('begin', this.spy);
+        this.basset.on('end', function() {
+          assert.calledOnce(_this.spy);
+          return done();
+        });
+        return this.basset.sniff();
+      },
       'test start': function(done) {
         var _this = this;
-        this.basset.on('start', this.spy);
+        this.basset.on('testStart', this.spy);
         this.basset.on('end', function() {
           assert.calledThrice(_this.spy);
           return done();
@@ -165,7 +174,7 @@ buster.testCase('Basset test case', {
       },
       'test stop': function(done) {
         var _this = this;
-        this.basset.on('stop', this.spy);
+        this.basset.on('testStop', this.spy);
         this.basset.on('end', function() {
           assert.calledThrice(_this.spy);
           return done();

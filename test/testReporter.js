@@ -30,10 +30,13 @@ buster.testCase('Reporter test case', {
       });
     },
     'test call start': function() {
-      return this.testBond('start', 'onStart');
+      return this.testBond('testStart', 'onTestStart');
     },
     'test call stop': function() {
-      return this.testBond('stop', 'onStop');
+      return this.testBond('testStop', 'onTestStop');
+    },
+    'test call begin': function() {
+      return this.testBond('begin', 'onBegin');
     },
     'test call end': function() {
       return this.testBond('end', 'onEnd');

@@ -20,17 +20,9 @@ buster.testCase 'Reporter test case',
       assert.exception =>
         @reporter.bind {}
 
-    'test call start': ->
-      @testBond 'start', 'onStart'
-
-    'test call stop': ->
-      @testBond 'stop', 'onStop'
-
-    'test call end': ->
-      @testBond 'end', 'onEnd'
-
-    'test call result': ->
-      @testBond 'result', 'onResult'
-
-    'test call failure': ->
-      @testBond 'failure', 'onFailure'
+    'test call start': -> @testBond 'testStart', 'onTestStart'
+    'test call stop': ->  @testBond 'testStop', 'onTestStop'
+    'test call begin': -> @testBond 'begin', 'onBegin'
+    'test call end': -> @testBond 'end', 'onEnd'
+    'test call result': -> @testBond 'result', 'onResult'
+    'test call failure': -> @testBond 'failure', 'onFailure'

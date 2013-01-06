@@ -16,7 +16,7 @@ optimist = require('optimist')
   .string('r')
   .alias('r', 'reporter')
   .describe('r', 'Reporter [minimal, full]')
-  .default('r', 'full')
+  .default('r', 'minimal')
 
   .check((args) ->
     if args.n and (parseInt(args.n, 10).toString() isnt args.n)

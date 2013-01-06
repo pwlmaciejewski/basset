@@ -87,15 +87,22 @@ buster.testCase 'Basset test case',
 			setUp: ->
 				@spy = sinon.spy()
 
+			'test begin': (done) ->
+				@basset.on 'begin', @spy
+				@basset.on 'end', =>
+					assert.calledOnce @spy
+					done()
+				@basset.sniff()
+
 			'test start': (done) ->
-				@basset.on 'start', @spy
+				@basset.on 'testStart', @spy
 				@basset.on 'end', =>
 					assert.calledThrice @spy
 					done()
 				@basset.sniff()
 
 			'test stop': (done) ->
-				@basset.on 'stop', @spy
+				@basset.on 'testStop', @spy
 				@basset.on 'end', =>
 					assert.calledThrice @spy
 					done()

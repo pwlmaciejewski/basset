@@ -4,17 +4,20 @@ class Reporter
   bind: (basset) ->
     unless basset instanceof Basset 
       throw new Error 'Reporter argument must be a Basset instance'
-    basset.on 'start', @onStart.bind @
-    basset.on 'stop', @onStop.bind @
+    basset.on 'begin', @onBegin.bind @
     basset.on 'end', @onEnd.bind @
+    basset.on 'testStart', @onTestStart.bind @
+    basset.on 'testStop', @onTestStop.bind @
     basset.on 'result', @onResult.bind @
     basset.on 'failure', @onFailure.bind @
 
-  onStart: ->
+  onBegin: ->
 
-  onStop: ->
-  
   onEnd: ->
+  
+  onTestStart: ->
+
+  onTestStop: ->
 
   onResult: ->
 
