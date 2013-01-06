@@ -1,5 +1,6 @@
 ReporterFactory = require '../lib/reporterFactory'
 Basset = require '../lib/basset'
+
 optimist = require('optimist')
   .usage('basset [options] url')
   .demand(1)
@@ -15,7 +16,7 @@ optimist = require('optimist')
 
   .string('r')
   .alias('r', 'reporter')
-  .describe('r', 'Reporter [minimal, full]')
+  .describe('r', 'Reporter ' + '(' + Object.keys(ReporterFactory.reporters).join(', ') + ')')
   .default('r', 'minimal')
 
   .check((args) ->
