@@ -4,7 +4,6 @@ var ReporterFactory = require('../lib/reporterFactory');
 var Basset = require('../lib/basset');
 var optimist = require('optimist')
 	.usage('basset [options] url')
-	.demand(1)
 
 	.boolean('h')
 	.alias('h', 'help')
@@ -27,6 +26,10 @@ var optimist = require('optimist')
 	.check(function(args) {
 	  if (args.n && (parseInt(args.n, 10).toString() !== args.n)) {
 	    throw new Error('Num must be a decimal number');
+	  }
+
+	  if (args._.length === 0 && !(args.h || args.v)) {
+	  	throw new Error('You need to specify at least one argument');
 	  }
 	});
 
