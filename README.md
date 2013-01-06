@@ -116,7 +116,7 @@ and you can set values only from that array. It means that if `valueNames = ['fo
 you can `setValue('foo', 1)` but not `setValue('bar', 1)`. By default `valueNames` is empty,
 so you need to derive from `Result` to create something functional.
 
-##### `getValueNames`
+##### `getValueNames()`
 
 Returns a copy of internal `valueNames` array.
 
@@ -147,7 +147,7 @@ feed the object with a har json.
 
 ##### `feedWithHar(har)`
 
-Accepts an object and gets essential information from it. It `har` isn't a valid
+Accepts an object and gets essential information from it. If `har` isn't a valid
 har object it throws an `Error`.
 
 ##### other methods
@@ -157,7 +157,7 @@ For more information about `HarResult` class see `lib/harResult.coffee`.
 ### Statistic class
 
 `Statistic` class has many `Result` intances. It can compute average
-and standard deviation from it.
+and standard deviation from them.
 
 ##### `addResult(result)`
 
