@@ -1,6 +1,6 @@
 {
   "name": "basset",
-  "description": "Website performance sniffer.",
+  "description": "Website performance sniffer. Uses phantomjs and netsniff.js to perform multiple tests and display average results.",
   "version": "0.0.1",
   "homepage": "https://github.com/fragphace/basset",
   "author": {
