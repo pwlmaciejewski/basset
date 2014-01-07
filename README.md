@@ -42,7 +42,7 @@ Basic example:
 
 ```javascript
 	var Basset = require('basset');
-	var basset = new Basset('http://google.com', { repeatNum: 10 });
+	var basset = new Basset('http://google.com', { repeatNum: 2 });
 	basset.on('end', function (results) {
 		average = results.average()
 		console.log('onLoad: ' + average.getValue('onLoad'));
@@ -74,7 +74,7 @@ Emitted after all tests stopped. Passes `Statistic` intance to handler function.
 See `Statistic class` for more information.
 
 ```javascript
-	var basset = new Basset('http://google.com', { repeatNum: 10 });
+	var basset = new Basset('http://google.com', { repeatNum: 2 });
 	basset.on('end', function (results) {
 		var avg = results.average();
 		console.log(avg.getValue('onLoad'));
@@ -93,7 +93,7 @@ See `HarResult class` and `Result class` section for more informaction.
 
 ```javascript
 	var basset = new Basset('http://bbc.com');
-	basset.on('testStart', function (result) {
+	basset.on('result', function (result) {
 		console.log(result.getValue('onLoad')); // Prints onLoad time
 	});
 	basset.sniff();
