@@ -43,7 +43,7 @@ Basic example:
 ```javascript
 	var Basset = require('basset');
 	var basset = new Basset('http://google.com', { repeatNum: 10 });
-	basset.on('done', function (results) {
+	basset.on('end', function (results) {
 		average = results.average()
 		console.log('onLoad: ' + average.getValue('onLoad'));
 	});
@@ -84,8 +84,12 @@ See `Statistic class` for more information.
 
 ##### `testStart` event
 
-Emitted on test start. Passes `HarResult` instance to handler function.
-See `HarResult class` and `Result class` section for more information.
+Emitted on test start.
+
+##### `result` event
+
+Emitted when test gives valid result. Passes `HarResult` instance to handler function.
+See `HarResult class` and `Result class` section for more informaction.
 
 ```javascript
 	var basset = new Basset('http://bbc.com');
@@ -94,11 +98,6 @@ See `HarResult class` and `Result class` section for more information.
 	});
 	basset.sniff();
 ```
-
-##### `result` event
-
-Emitted when test gives valid result. Passes `HarResult` instance to handler function.
-See `HarResult class` and `Result class` section for more informaction.
 
 ##### `failure` event
 
