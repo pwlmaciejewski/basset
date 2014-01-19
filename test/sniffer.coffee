@@ -1,4 +1,4 @@
-buster = require 'buster'
+assert = require('chai').assert
 sinon = require 'sinon'
 sandbox = require 'sandboxed-module'
 path = require 'path'
@@ -9,49 +9,49 @@ execStdout = -> '{}'
 execSpy = sinon.spy (command, options, callback = ->) ->
 	callback(execError(), execStdout())
 
-Sniffer = sandbox.require '../lib/sniffer'
+Sniffer = sandbox.require '../lib/sniffer',
 	requires:
 		child_process:
 			exec: execSpy
 
-buster.testCase 'Sniffer test case',
-	setUp: ->
+suite 'Sniffer test case', ->
+	setup ->
 		execError = -> null
 		execStdout = -> '{}'
 		@url = 'http://example.com'
 		@sniffer = new Sniffer @url
 
-	'first argument (url)':
-		'test is required': ->
-			assert.exception =>
+	suite 'first argument (url)', ->
+		test 'is required', ->
+			assert.throws =>
 				new Sniffer()
 
-		'test is a string': ->
-			assert.exception =>
+		test 'is a string', ->
+			assert.throws =>
 				new Sniffer {}
 
-	'run':
-		setUp: ->
-			@spy = sinon.spy() 
+	suite 'run', ->
+		setup ->
+			@spy = sinon.spy()
 
-		'test runs phantomjs': ->
+		test 'runs phantomjs', ->
 			netsniffPath = path.resolve __dirname, '../vendor/netsniff.js'
 			phantomjsExecCommand = 'phantomjs ' + netsniffPath + ' ' + @url
 			@sniffer.run()
-			assert.calledWith execSpy, phantomjsExecCommand
+			assert.ok execSpy.calledWith(phantomjsExecCommand)
 
-		'test calls callback': ->
+		test 'calls callback', ->
 			@sniffer.run @spy
-			assert.called @spy
+			assert.ok @spy.called
 
-		'test error': ->
+		test 'error', ->
 			error = new Error 'Foo error'
 			execError = ->	error
 			@sniffer.run @spy
-			assert.calledWith @spy, error
+			assert.ok @spy.calledWith(error)
 
-		'test result': ->
-			har = 
+		test 'result', ->
+			har =
 				log:
 					pages: [
 						pageTimings:
@@ -61,11 +61,11 @@ buster.testCase 'Sniffer test case',
 			execStdout = ->
 				JSON.stringify har
 			@sniffer.run @spy
-			assert.calledWith @spy, null
-			assert @spy.getCall(0).args[1].constructor.name is 'HarResult'
+			assert.ok @spy.calledWith(null)
+			assert.equal @spy.getCall(0).args[1].constructor.name, 'HarResult'
 
-		'test unparsable stdout': ->
+		test 'unparsable stdout', ->
 			execStdout = ->
 				'!@#$%'
 			@sniffer.run @spy
-			assert.equals @spy.getCall(0).args[0].constructor.name, 'Error'
+			assert.equal @spy.getCall(0).args[0].constructor.name, 'Error'

@@ -1,8 +1,8 @@
 # basset [![Build Status](https://secure.travis-ci.org/fragphace/basset.png?branch=master)](http://travis-ci.org/fragphace/basset)
 
-Website performance sniffer. 
-Uses [phantomjs](http://phantomjs.org/) and 
-[netsniff.js](https://github.com/ariya/phantomjs/blob/master/examples/netsniff.js) 
+Website performance sniffer.
+Uses [phantomjs](http://phantomjs.org/) and
+[netsniff.js](https://github.com/ariya/phantomjs/blob/master/examples/netsniff.js)
 to perform multiple tests and display averaged results.
 
 ## Installation
@@ -11,7 +11,7 @@ to perform multiple tests and display averaged results.
 npm install -g basset
 ```
 
-**Caution!** Remember that you need to have `phantomjs` command in your `PATH`. 
+**Caution!** Remember that you need to have `phantomjs` command in your `PATH`.
 
 ## Command-line usage
 
@@ -35,7 +35,7 @@ used as a node module, so don't be affraid to `require('basset')` in your projec
 It's extremely easy to use `basset` in your project:
 
 * Basset needs to be initialized with an `url` and `options`.
-* Method `sniff` starts the testing sequence. 
+* Method `sniff` starts the testing sequence.
 * Basset communicates with outer world using events (it derives from `EventEmitter`).
 
 Basic example:
@@ -169,6 +169,12 @@ Returns a `Result` instance which represents an average of `results` array items
 ##### `deviation()`
 
 Returns a `Result` instance which represent a standard deviation of `results` array items.
+
+## Development
+
+`make coffee` - generate js files
+`make watch` - make sure to have `inotifywatch` installed
+`npm test` - run tests
 
 ## Changelog
 

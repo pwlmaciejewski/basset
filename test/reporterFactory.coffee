@@ -1,19 +1,18 @@
-buster = require 'buster'
+assert = require('chai').assert
 ReporterFactory = require '../lib/reporterFactory'
 Reporter = require '../lib/reporter/reporter'
 
-buster.testCase 'Reporter factory test case',
-
-	'create reporter':
-		setUp: ->
+suite 'Reporter factory test case', ->
+	suite 'create reporter', ->
+		setup ->
 			@Factory = Object.create ReporterFactory
 			@Factory.reporters =
 				foo: Reporter
 
-		'test valid reporter': ->
+		test 'valid reporter', ->
 			reporter = @Factory.createReporter 'foo'
-			assert reporter instanceof Reporter
+			assert.instanceOf reporter,  Reporter
 
-		'test invalid reporter': ->
-			assert.exception =>
+		test 'invalid reporter', ->
+			assert.throws =>
 				@Factory.createReporter 'bar'
