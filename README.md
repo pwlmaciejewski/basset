@@ -173,7 +173,7 @@ Returns a `Result` instance which represent a standard deviation of `results` ar
 ## Development
 
 * `make coffee` - generate js files
-* `make watch` - make sure to have `inotifywatch` installed
+* `make watch` - make sure to have `inotifywait` installed (`apt-get install inotify-tools`)
 * `npm test` - run tests
 
 ## Changelog
