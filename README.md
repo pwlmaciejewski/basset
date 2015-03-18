@@ -1,4 +1,4 @@
-# basset [![Build Status](https://secure.travis-ci.org/fragphace/basset.png?branch=master)](http://travis-ci.org/fragphace/basset)
+# basset [![Build Status](https://secure.travis-ci.org/pwlmaciejewski/basset.png?branch=master)](http://travis-ci.org/pwlmaciejewski/basset)
 
 Website performance sniffer.
 Uses [phantomjs](http://phantomjs.org/) and
