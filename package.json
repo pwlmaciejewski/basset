@@ -38,6 +38,6 @@
   "dependencies": {
     "optimist": "~0.3.5",
     "async": "~0.1.22",
-    "cli-color": "~0.2.1"
+    "cli-color": "~2.0.0"
   }
 }
